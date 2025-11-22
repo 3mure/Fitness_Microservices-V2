@@ -1,0 +1,150 @@
+{
+  "Routes": [
+    // ==========================================
+    // 1. Authentication Service
+    // ==========================================
+    {
+      "DownstreamPathTemplate": "/api/auth/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "authenticationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET" ]
+    },
+
+    // ==========================================
+    // 2. User Profile Service
+    // (تأكد أنك أضفت هذه الخدمة في docker-compose إذا كانت موجودة)
+    // ==========================================
+    {
+      "DownstreamPathTemplate": "/api/profile/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "userprofileservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/profile/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    // ==========================================
+    // 3. Workout Service
+    // ==========================================
+    {
+      "DownstreamPathTemplate": "/api/workouts/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "workoutservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/workouts/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    // ==========================================
+    // 4. Nutrition Service
+    // ==========================================
+    {
+      "DownstreamPathTemplate": "/api/nutrition/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "nutritionservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/nutrition/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    // ==========================================
+    // 5. Progress Tracking Service
+    // ==========================================
+    {
+      "DownstreamPathTemplate": "/api/progress/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "progresstrackingservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/progress/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    // ==========================================
+    // 6. Fitness Calculation Service
+    // ==========================================
+    {
+      "DownstreamPathTemplate": "/api/fitness-calculator/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "fitnesscalculationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/fitness-calculator/{everything}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    // ==========================================
+    // 7. Smart Coach Service
+    // (تأكد أنك أضفت هذه الخدمة في docker-compose إذا كانت موجودة)
+    // ==========================================
+    {
+      "DownstreamPathTemplate": "/api/smart-coach/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "smartcoachservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/smart-coach/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:8088",
+    "RateLimitOptions": {
+      "EnableRateLimiting": true,
+      "Period": "1s",
+      "PeriodTimespan": 1,
+      "Limit": 5
+    }
+  }
+}
