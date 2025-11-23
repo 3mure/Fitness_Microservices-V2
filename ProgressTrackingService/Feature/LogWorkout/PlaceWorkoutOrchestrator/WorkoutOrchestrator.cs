@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿ using MediatR;
 using ProgressTrackingService.Feature.LogWorkout.CreateWorkoutLogCommand;
 using ProgressTrackingService.Feature.LogWorkout.PlaceWorkoutOrchestrator.DTos;
 using ProgressTrackingService.Feature.UserStatisticsfiles.GetByUserIdQuery;
@@ -23,6 +23,7 @@ namespace ProgressTrackingService.Feature.LogWorkout.PlaceWorkoutOrchestrator
             // Additional orchestration logic can be added here in the future
             var UpdateUserStatsCommand = new UpdateUserstatisticsCommand(request.WorkoutLog.CaloriesBurned,request.WorkoutLog.UserId);
            await _mediator.Send(UpdateUserStatsCommand, cancellationToken);
+            
             
             var userStatisticsId = await _mediator.Send(new GetUserStatisticsId_ByUserIdQuery(request.WorkoutLog.UserId), cancellationToken);
 

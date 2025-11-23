@@ -42,8 +42,8 @@ namespace ProgressTrackingService.Feature.LogWorkout.CreateWorkoutLogCommand
                 CompletedAt=workoutLog.CompletedAt,
                 Duration=workoutLog.Duration,
                 CaloriesBurned=workoutLog.CaloriesBurned,
-                CurrentStreak=0,
-                TotalWorkouts=0,
+                CurrentStreak=1,
+                TotalWorkouts=1,
                 TotalCaloriesBurned=0,
                 
                 NewAchievements=new List<AchievementDto>(),  

@@ -5,7 +5,7 @@ using ProgressTrackingService.Feature.UserStatistics.CreateUserStatistics;
 namespace ProgressTrackingService.Feature.UserStatisticsfiles.CreateUserStatistics
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/")]
     public class UserStatisticsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -13,7 +13,7 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.CreateUserStatisti
         {
             _mediator = mediator;
         }
-        [HttpPost]
+        [HttpPost("CreateUserStatistics")]
         public async Task<IActionResult> CreateUserStatistics([FromBody] CreateUserStatisticsCommand request)
         {
             var command = new CreateUserStatisticsCommand(request.userId,request.currentWeight,request.goalWeight);

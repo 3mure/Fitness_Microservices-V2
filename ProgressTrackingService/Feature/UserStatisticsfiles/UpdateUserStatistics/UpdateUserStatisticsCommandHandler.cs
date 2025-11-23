@@ -21,6 +21,7 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.UpdateUserStatisti
         {
             var existing = _repository.GetAll()
                 .FirstOrDefault(us => us.UserId == request.userId);
+           
 
             if (existing is null)
                 return false;
@@ -34,8 +35,20 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.UpdateUserStatisti
                 Id = existing.Id,
                 TotalWorkouts = existing.TotalWorkouts + 1,
                 TotalCaloriesBurned = existing.TotalCaloriesBurned + request.CaloriesBurned,
-                UpdatedAt = today
+                UpdatedAt=today
+                
             };
+            if(existing.CurrentStreak==0&&existing.LongestStreak==0)
+            {   
+                updatedStats.CurrentStreak = 1;
+                updatedStats.LongestStreak = 1;
+               
+                _repository.SaveInclude(updatedStats, "TotalWorkouts",
+                    "TotalCaloriesBurned", "CurrentStreak", "LongestStreak", "UpdatedAt");
+                var savedFirst = await _unitOfWork.SaveChangesAsync();
+                return savedFirst > 0;
+            }
+
 
             var includeFields = new List<string>
             {
@@ -50,6 +63,7 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.UpdateUserStatisti
                 // First time ever
                 updatedStats.CurrentStreak = 1;
                 updatedStats.LongestStreak = 1;
+                updatedStats.UpdatedAt = today;
                 includeFields.Add("CurrentStreak");
                 includeFields.Add("LongestStreak");
             }
@@ -58,6 +72,7 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.UpdateUserStatisti
                 // Continue streak
                 updatedStats.CurrentStreak = existing.CurrentStreak + 1;
                 includeFields.Add("CurrentStreak");
+                
 
                 if (updatedStats.CurrentStreak > existing.LongestStreak)
                 {
@@ -74,6 +89,7 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.UpdateUserStatisti
                     includeFields.Add("LongestStreak");
                 }
                 updatedStats.CurrentStreak = 1;
+               
                 includeFields.Add("CurrentStreak");
             }
            

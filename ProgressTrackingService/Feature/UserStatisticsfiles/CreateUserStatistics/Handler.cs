@@ -26,7 +26,7 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.CreateUserStatisti
                 UserId = request.userId,
                 StartingWeight = request.currentWeight,
                 GoalWeight = request.goalWeight,
-                LatestWeight = 0,
+                LatestWeight = request.currentWeight ,
                 TotalWorkouts = 0,
                 TotalCaloriesBurned = 0,
                 CurrentStreak = 0,
