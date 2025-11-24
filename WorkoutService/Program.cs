@@ -14,6 +14,7 @@ using WorkoutService.Domain.Interfaces;
 using WorkoutService.Features;
 using WorkoutService.Infrastructure.Data;
 using WorkoutService.Infrastructure.UnitOfWork;
+using WorkoutService.MiddleWares;
 using WorkoutService.Migrations;
 
 public class Program
