@@ -27,7 +27,7 @@ namespace ProgressTrackingService.Feature.LogWorkout.PlaceWorkoutOrchestrator
             
             var userStatisticsId = await _mediator.Send(new GetUserStatisticsId_ByUserIdQuery(request.WorkoutLog.UserId), cancellationToken);
 
-            var userstatistics = await _mediator.Send(new GetUserStatisticsQuery(userStatisticsId), cancellationToken);
+            var userstatistics = await _mediator.Send(new GetUserWeightStatisticsQuery(userStatisticsId), cancellationToken);
             var response = new WorkoutLogResponseDto 
             { 
              Id = workoutLogResponse.Id,

@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OnlineExam.Infrastructure.UnitOfWork;
-using ProgressTrackingService.Domain.Interfaces;
 using ProgressTrackingService.Infrastructure;
 using ProgressTrackingService.Infrastructure.Data;
 
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProgressTrackingService;
-using ProgressTrackingService.Data;
+using ProgressTrackingService.Domain.Interfaces;
+using ProgressTrackingService.Shared;
 
 namespace ProgressTrackingService
 {
@@ -25,6 +25,25 @@ namespace ProgressTrackingService
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            
+            // Configure HttpClient for FitnessCalculationService
+            var fitnessCalculationServiceUrl = builder.Configuration["Services:FitnessCalculationService:BaseUrl"] 
+                ?? "http://localhost:5275";
+            
+            if (string.IsNullOrWhiteSpace(fitnessCalculationServiceUrl))
+            {
+                throw new InvalidOperationException("FitnessCalculationService BaseUrl is not configured. Please set Services:FitnessCalculationService:BaseUrl in appsettings.json");
+            }
+            
+            Console.WriteLine($"[ProgressTrackingService] Configuring FitnessCalculationService URL: {fitnessCalculationServiceUrl}");
+            
+            builder.Services.AddHttpClient<BmiServiceClient>(client =>
+            {
+                client.BaseAddress = new Uri(fitnessCalculationServiceUrl);
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
+            // Note: AddHttpClient<T> automatically registers T, so we don't need AddScoped
+
 
             builder.Services.AddScoped<IUniteOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(BaseRepository<>));

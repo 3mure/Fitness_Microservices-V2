@@ -14,8 +14,9 @@ namespace ProgressTrackingService.Infrastructure.Data
         public DbSet<WeightHistory> weightHistories { get; set; }
 
         public DbSet<UserStatistics> userStatistics { get; set; }
+        public DbSet<WeightTimingAndNot> weightTimingAndNots { get; set; }
 
-        
+
 
 
 
