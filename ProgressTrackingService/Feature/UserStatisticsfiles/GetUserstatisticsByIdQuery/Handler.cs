@@ -4,7 +4,7 @@ using ProgressTrackingService.Domain.Interfaces;
 
 namespace ProgressTrackingService.Feature.UserStatisticsfiles.GetUserstatisticsByIdQuery
 {
-    public class Handler : IRequestHandler<GetUserStatisticsQuery, GetUserStatisticsQueryDto>
+    public class Handler : IRequestHandler<GetUserWeightStatisticsQuery, GetWeightstatisticsrelatedToUser>
     {
         private readonly IGenericRepository<Domain.Entity.UserStatistics> _repository;
 
@@ -12,15 +12,15 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.GetUserstatisticsB
         {
             this._repository = repository;
         }
-        public Task<GetUserStatisticsQueryDto> Handle(GetUserStatisticsQuery request, CancellationToken cancellationToken)
+        public Task<GetWeightstatisticsrelatedToUser> Handle(GetUserWeightStatisticsQuery request, CancellationToken cancellationToken)
         {
             var userStatistics = _repository.GetByIdAsync(request.UserStatisticId).Result;
             if (userStatistics == null)
             {
-                return Task.FromResult<GetUserStatisticsQueryDto>(null);
+                return Task.FromResult<GetWeightstatisticsrelatedToUser>(null);
             }
 
-            var dto = new GetUserStatisticsQueryDto
+            var dto = new GetWeightstatisticsrelatedToUser
             {
                 TotalWorkouts = userStatistics.TotalWorkouts,
                 TotalCaloriesBurned = userStatistics.TotalCaloriesBurned,

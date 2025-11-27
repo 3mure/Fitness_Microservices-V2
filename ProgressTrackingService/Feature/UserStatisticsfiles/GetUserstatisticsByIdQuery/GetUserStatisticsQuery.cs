@@ -2,6 +2,6 @@
 
 namespace ProgressTrackingService.Feature.UserStatisticsfiles.GetUserstatisticsByIdQuery
 {
-    public record GetUserStatisticsQuery(int UserStatisticId) : IRequest<GetUserStatisticsQueryDto>;
+    public record GetUserWeightStatisticsQuery(int UserStatisticId) : IRequest<GetWeightstatisticsrelatedToUser>;
 
 }

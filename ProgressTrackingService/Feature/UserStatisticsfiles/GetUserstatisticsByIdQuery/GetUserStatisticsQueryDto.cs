@@ -1,6 +1,6 @@
 ﻿namespace ProgressTrackingService.Feature.UserStatisticsfiles.GetUserstatisticsByIdQuery
 {
-    public class GetUserStatisticsQueryDto
+    public class GetWeightstatisticsrelatedToUser
     {
         
         public int TotalWorkouts { get; set; }
