@@ -30,11 +30,8 @@ namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
 
         public async Task<UpdateWeightHestoryResponseDto> Handle(CreateWeightHistoryCommand request, CancellationToken cancellationToken)
         {
-            // Call FitnessCalculationService to get BMI
+            
             var bmi = await _bmiService.GetBmiAsync(request.WeightEntryRequestDto.Weight, request.WeightEntryRequestDto.height);
-
-
-
 
             var weigthHistory = new WeightHistory 
             {
@@ -52,10 +49,6 @@ namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
             var weightStatistics = await _mediator.Send(new GetWeightStatisticsQuery(request.WeightEntryRequestDto.UserId));
 
             var difference = CalculationMethods.CalculateDifference(request.WeightEntryRequestDto.Weight, weightStatistics.LatestWeight);
-
-
-            
-
 
             var Updatedweightresponse = new UpdateWeightHestoryResponseDto
             {
