@@ -1,11 +1,9 @@
 ﻿namespace ProgressTrackingService.MessageBroker.Messages
 {
-    public class WeightUpdated
+    public class WeightUpdatedMessage : BasicMessage
     {
         public int UserId { get; set; }
-
-        public double weight { get; set; }
-
-
+     
+        public double NewWeight { get; set; }
     }
 }

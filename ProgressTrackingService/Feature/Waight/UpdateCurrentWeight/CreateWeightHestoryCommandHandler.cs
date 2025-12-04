@@ -1,4 +1,7 @@
-﻿ using MediatR;
+﻿using System.Reflection.Metadata;
+using InventoryService.MessageBroker;
+using ProgressTrackingService.MessageBroker.Messages;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using ProgressTrackingService.Domain.Entity;
 using ProgressTrackingService.Domain.Interfaces;
@@ -7,6 +10,7 @@ using ProgressTrackingService.Feature.Waight.UpdateCurrentWeight.DTOs;
 using ProgressTrackingService.Helper;
 using ProgressTrackingService.Infrastructure;
 using ProgressTrackingService.Shared;
+using RabbitMQ.Client;
 
 namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
 {
@@ -15,16 +19,19 @@ namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
         private readonly IGenericRepository<WeightHistory> _repository;
         private readonly IUniteOfWork _uOW;
         private readonly IMediator _mediator;
+        private readonly IMessageBrokerPublisher _messageBroker;
         private readonly BmiServiceClient _bmiService;
 
         public CreateWeightHestoryCommandHandler(IGenericRepository<WeightHistory> repository,
             IUniteOfWork UOW,
             IMediator mediator,
+            IMessageBrokerPublisher messageBroker,
             BmiServiceClient bmi)
         {
             _repository = repository;
             _uOW = UOW;
             this._mediator = mediator;
+            this._messageBroker = messageBroker;
             this._bmiService = bmi;
         }
 
@@ -72,6 +79,25 @@ namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
                 
                 Bmi=bmi
             };
+
+            try
+            {
+                var WeightUpdatedMessage = new WeightUpdatedMessage
+                {
+                    UserId = request.WeightEntryRequestDto.UserId,
+                    NewWeight = request.WeightEntryRequestDto.Weight,
+                    Date = request.WeightEntryRequestDto.Date
+                };
+               
+
+                await _messageBroker.PublishMessageAsync(WeightUpdatedMessage, "progress.exchange.events", "progress.weight.updated");
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't fail the  creation
+                Console.WriteLine($"Failed to publish product created message: {ex.Message}");
+            }
+
             return Updatedweightresponse;
 
 
