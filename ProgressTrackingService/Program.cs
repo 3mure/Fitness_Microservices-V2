@@ -1,14 +1,15 @@
+using InventoryService.MessageBroker;
 using MediatR;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OnlineExam.Infrastructure.UnitOfWork;
-using ProgressTrackingService.Infrastructure;
-using ProgressTrackingService.Infrastructure.Data;
-
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using ProgressTrackingService;
 using ProgressTrackingService.Domain.Interfaces;
+using ProgressTrackingService.Infrastructure;
+using ProgressTrackingService.Infrastructure.Data;
 using ProgressTrackingService.Shared;
+using ProgressTrackingService.MessageBroker;
 
 namespace ProgressTrackingService
 {
@@ -43,7 +44,10 @@ namespace ProgressTrackingService
                 client.Timeout = TimeSpan.FromSeconds(30);
             });
             // Note: AddHttpClient<T> automatically registers T, so we don't need AddScoped
-
+            builder.Services.AddSingleton<IMessageBrokerPublisher>(provider =>
+            {
+                return new MessageBrokerPublisher(provider.GetRequiredService<IConfiguration>());
+            }); 
 
             builder.Services.AddScoped<IUniteOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(BaseRepository<>));
@@ -67,6 +71,9 @@ namespace ProgressTrackingService
             builder.Services.AddDistributedMemoryCache();
 
             builder.Services.AddMediatR(typeof(Program).Assembly);
+
+            // Register RabbitMQ Consumer Service as a hosted service
+            builder.Services.AddHostedService<RabbitMQConsumerService>();
 
             var app = builder.Build();
 
