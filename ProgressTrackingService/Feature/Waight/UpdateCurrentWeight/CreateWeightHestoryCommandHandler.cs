@@ -45,7 +45,8 @@ namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
                 UserId = request.WeightEntryRequestDto.UserId,
                 Weight = request.WeightEntryRequestDto.Weight,
                 CreatedAt = DateTime.Now,
-                LoggedAt = request.WeightEntryRequestDto.Date
+                LoggedAt = request.WeightEntryRequestDto.Date,
+                Bmi = bmi,
             };
           
             var AddedWeight = await _repository.AddAsync(weigthHistory);

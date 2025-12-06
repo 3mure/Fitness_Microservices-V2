@@ -6,6 +6,7 @@
         public int UserId { get; set; }
         public double Weight { get; set; } // in pounds
         public DateTime LoggedAt { get; set; }
+        public double Bmi { get; set; }
 
     }
 }

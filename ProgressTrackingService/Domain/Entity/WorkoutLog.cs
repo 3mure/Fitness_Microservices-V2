@@ -12,6 +12,6 @@
         public int Rating { get; set; } // 1 to 5
         public string Notes { get; set; } = string.Empty;
         public DateTime CompletedAt { get; set; } = DateTime.Now;
-
+          
     }
 }
