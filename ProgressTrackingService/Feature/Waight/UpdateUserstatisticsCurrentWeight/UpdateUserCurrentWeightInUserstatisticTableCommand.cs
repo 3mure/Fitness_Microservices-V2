@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿ using MediatR;
 
 namespace ProgressTrackingService.Feature.Waight.UpdateUserstatisticsCurrentWeight
 {
