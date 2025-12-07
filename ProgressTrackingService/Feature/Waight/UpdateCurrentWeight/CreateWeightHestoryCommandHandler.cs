@@ -17,18 +17,21 @@ namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
     public class CreateWeightHestoryCommandHandler : IRequestHandler<CreateWeightHistoryCommand, UpdateWeightHestoryResponseDto>
     {
         private readonly IGenericRepository<WeightHistory> _repository;
+        private readonly IGenericRepository<WeightTimingAndNot> _timingAndNotesRepository;
         private readonly IUniteOfWork _uOW;
         private readonly IMediator _mediator;
         private readonly IMessageBrokerPublisher _messageBroker;
         private readonly BmiServiceClient _bmiService;
 
         public CreateWeightHestoryCommandHandler(IGenericRepository<WeightHistory> repository,
+            IGenericRepository<WeightTimingAndNot> timingAndNotesRepository,
             IUniteOfWork UOW,
             IMediator mediator,
             IMessageBrokerPublisher messageBroker,
             BmiServiceClient bmi)
         {
             _repository = repository;
+            _timingAndNotesRepository = timingAndNotesRepository;
             _uOW = UOW;
             this._mediator = mediator;
             this._messageBroker = messageBroker;
@@ -50,8 +53,23 @@ namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight
             };
           
             var AddedWeight = await _repository.AddAsync(weigthHistory);
-
             await _uOW.SaveChangesAsync();
+
+            // Save notes and timing if provided
+            if (!string.IsNullOrWhiteSpace(request.WeightEntryRequestDto.Notes) || 
+                !string.IsNullOrWhiteSpace(request.WeightEntryRequestDto.Time))
+            {
+                var weightTimingAndNot = new WeightTimingAndNot
+                {
+                    UserId = request.WeightEntryRequestDto.UserId,
+                    WeightHistoryId = AddedWeight.Id,
+                    Time = request.WeightEntryRequestDto.Time ?? string.Empty,
+                    Notes = request.WeightEntryRequestDto.Notes ?? string.Empty
+                };
+
+                await _timingAndNotesRepository.AddAsync(weightTimingAndNot);
+                await _uOW.SaveChangesAsync();
+            }
 
 
             var weightStatistics = await _mediator.Send(new GetWeightStatisticsQuery(request.WeightEntryRequestDto.UserId));

@@ -1,11 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ProgressTrackingService.Feature.UserStatistics.CreateUserStatistics;
+using ProgressTrackingService.Feature.UserStatistics.CreateUserStatistics.DTOs;
+using ProgressTrackingService.Shared;
 
 namespace ProgressTrackingService.Feature.UserStatisticsfiles.CreateUserStatistics
 {
     [ApiController]
-    [Route("api/[controller]/")]
+    [Route("api/v1/userstatistics")]
     public class UserStatisticsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -13,12 +15,19 @@ namespace ProgressTrackingService.Feature.UserStatisticsfiles.CreateUserStatisti
         {
             _mediator = mediator;
         }
-        [HttpPost("CreateUserStatistics")]
+        [HttpPost]
         public async Task<IActionResult> CreateUserStatistics([FromBody] CreateUserStatisticsCommand request)
         {
-            var command = new CreateUserStatisticsCommand(request.userId,request.currentWeight,request.goalWeight);
-            var result = await _mediator.Send(command);
-            return Ok(result);
+            try
+            {
+                var command = new CreateUserStatisticsCommand(request.userId, request.currentWeight, request.goalWeight);
+                var result = await _mediator.Send(command);
+                return Ok(EndpointResponse<UserStatisticsResponseDto>.SuccessResponse(result, "User statistics created successfully"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(EndpointResponse<UserStatisticsResponseDto>.NotFoundResponse($"Error creating user statistics: {ex.Message}"));
+            }
         }
     }
 }

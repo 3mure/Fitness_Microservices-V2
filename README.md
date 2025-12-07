@@ -11,6 +11,7 @@ Welcome to the Elevate Fitness application! This project is a comprehensive fitn
   - [Running the System](#running-the-system)
 - [API Gateway](#api-gateway)
 - [Development Guidelines](#development-guidelines)
+- [Documentation](#documentation)
 
 ## Overview
 
@@ -39,7 +40,21 @@ This project is composed of the following microservices:
 
 ### Running the System
 
-While each service can be run individually, the recommended way to run the entire system is through Docker Compose. *(Note: A `docker-compose.yml` file will be added in the future to orchestrate the services.)*
+While each service can be run individually, the recommended way to run the entire system is through Docker Compose.
+
+#### Using Docker Compose (Recommended)
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+#### Running Individual Services
 
 To run an individual service (e.g., `WorkoutService`):
 
@@ -67,3 +82,22 @@ The **Fitness API Gateway** is the public-facing entry point for the entire syst
 -   **Communication:** Services should communicate asynchronously where possible (e.g., using a message broker). For synchronous communication, use lightweight protocols like REST.
 -   **Code Style:** Follow the established coding conventions and patterns within each service.
 -   **Testing:** Each service should have its own set of unit and integration tests.
+
+## Documentation
+
+For comprehensive documentation, please refer to:
+
+- **[PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md)** - Complete technical documentation covering:
+  - Detailed architecture overview
+  - Progress Tracking Service implementation details
+  - Docker Compose orchestration guide
+  - API Gateway configuration (Ocelot/YARP)
+  - Message broker integration (RabbitMQ)
+  - API endpoints and usage examples
+  - Technology stack and design patterns
+
+- **[CV_PROJECT_DESCRIPTION.md](./CV_PROJECT_DESCRIPTION.md)** - CV-ready project description highlighting:
+  - Key technical achievements
+  - Skills demonstrated
+  - Project impact
+  - Ready-to-use bullet points for resumes

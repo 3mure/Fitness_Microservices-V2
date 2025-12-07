@@ -37,7 +37,7 @@ namespace ProgressTrackingService.Infrastructure.Data
             {
               if(entry.Entity is BaseEntity baseEntity)
                 {
-                    switch(entry.Entity)
+                    switch(entry.State)
                     {
                         case EntityState.Added:
                             baseEntity.CreatedAt = DateTime.UtcNow;
@@ -64,6 +64,14 @@ namespace ProgressTrackingService.Infrastructure.Data
             modelBuilder.Entity<UserAchievement>().HasQueryFilter(e=>!e.IsDeleted);
             modelBuilder.Entity<WeightHistory>().HasQueryFilter(e=>!e.IsDeleted);
             modelBuilder.Entity<UserStatistics>().HasQueryFilter(e=>!e.IsDeleted);
+            modelBuilder.Entity<WeightTimingAndNot>().HasQueryFilter(e=>!e.IsDeleted);
+            
+            // Configure relationship between WeightHistory and WeightTimingAndNot
+            modelBuilder.Entity<WeightTimingAndNot>()
+                .HasOne(wtn => wtn.WeightHistory)
+                .WithMany()
+                .HasForeignKey(wtn => wtn.WeightHistoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         
