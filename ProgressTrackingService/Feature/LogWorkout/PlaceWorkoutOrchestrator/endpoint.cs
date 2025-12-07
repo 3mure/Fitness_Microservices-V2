@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ProgressTrackingService.Shared;
 
 namespace ProgressTrackingService.Feature.LogWorkout.PlaceWorkoutOrchestrator
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/workout")]
     public class WorkoutController : ControllerBase 
     {
        
@@ -15,11 +16,18 @@ namespace ProgressTrackingService.Feature.LogWorkout.PlaceWorkoutOrchestrator
             
             _mediator = mediator;
         }
-        [HttpPost]
+        [HttpPost("log")]
         public async Task<IActionResult> PlaceWorkout([FromBody] WorkoutOrchestrator command) 
         {
-            var result = await _mediator.Send(command);
-            return Ok(result);
+            try
+            {
+                var result = await _mediator.Send(command);
+                return Ok(EndpointResponse<DTos.WorkoutLogResponseDto>.SuccessResponse(result, "Workout logged successfully"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(EndpointResponse<DTos.WorkoutLogResponseDto>.NotFoundResponse($"Error logging workout: {ex.Message}"));
+            }
         }
     }
 }

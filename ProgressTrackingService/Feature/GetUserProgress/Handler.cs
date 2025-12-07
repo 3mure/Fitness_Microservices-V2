@@ -28,6 +28,44 @@ namespace ProgressTrackingService.Feature.GetUserProgress
         }
         public Task<UserProgressDto> Handle(GetUserProgressQuery request, CancellationToken cancellationToken)
         {
+            // Calculate date range based on period or custom dates
+            DateTime? startDateFilter = null;
+            DateTime? endDateFilter = null;
+            DateTime today = DateTime.Today;
+
+            if (!string.IsNullOrEmpty(request.startDate) && !string.IsNullOrEmpty(request.endDate))
+            {
+                // Custom date range
+                if (DateTime.TryParse(request.startDate, out DateTime parsedStart))
+                    startDateFilter = parsedStart.Date;
+                if (DateTime.TryParse(request.endDate, out DateTime parsedEnd))
+                    endDateFilter = parsedEnd.Date.AddDays(1).AddTicks(-1); // End of day
+            }
+            else
+            {
+                // Use period
+                var period = (request.period ?? "month").ToLower();
+                switch (period)
+                {
+                    case "week":
+                        startDateFilter = today.AddDays(-7);
+                        endDateFilter = today.AddDays(1).AddTicks(-1);
+                        break;
+                    case "month":
+                        startDateFilter = today.AddMonths(-1);
+                        endDateFilter = today.AddDays(1).AddTicks(-1);
+                        break;
+                    case "year":
+                        startDateFilter = today.AddYears(-1);
+                        endDateFilter = today.AddDays(1).AddTicks(-1);
+                        break;
+                    case "all":
+                    default:
+                        // No filter - get all data
+                        break;
+                }
+            }
+
             ////// Summary//////
             var statistics = statisticRepository.GetAll().FirstOrDefault(s => s.UserId == request.userId);
            
@@ -45,9 +83,16 @@ namespace ProgressTrackingService.Feature.GetUserProgress
                // AverageWorkoutDuration= statistics?.AverageWorkoutDuration ?? 0
 
             };
-            ////// Weight History//////
-            var weightEntries = weightRepository.GetAll()
-                .Where(w => w.UserId == request.userId)
+            ////// Weight History with date filtering//////
+            var weightQuery = weightRepository.GetAll()
+                .Where(w => w.UserId == request.userId);
+
+            if (startDateFilter.HasValue)
+                weightQuery = weightQuery.Where(w => w.LoggedAt >= startDateFilter.Value);
+            if (endDateFilter.HasValue)
+                weightQuery = weightQuery.Where(w => w.LoggedAt <= endDateFilter.Value);
+
+            var weightEntries = weightQuery
                 .OrderByDescending(w => w.CreatedAt)
                 .Select(w => new WeightHistoryDto
                 {
@@ -58,10 +103,16 @@ namespace ProgressTrackingService.Feature.GetUserProgress
                 })
                 .ToList();
 
-            ////Workout////
+            ////Workout with date filtering////
+            var workoutQuery = workoutRepository.GetAll()
+                .Where(w => w.UserId == request.userId && w.CreatedAt.HasValue);
+
+            if (startDateFilter.HasValue)
+                workoutQuery = workoutQuery.Where(w => w.CreatedAt.Value >= startDateFilter.Value);
+            if (endDateFilter.HasValue)
+                workoutQuery = workoutQuery.Where(w => w.CreatedAt.Value <= endDateFilter.Value);
             
-            var WorkoutEntries = workoutRepository.GetAll()
-                .Where(w => w.UserId == request.userId && w.CreatedAt.HasValue)
+            var WorkoutEntries = workoutQuery
                 .GroupBy(w=>w.CreatedAt.Value.Date)
                 .OrderByDescending(g=>g.Key)
 
@@ -80,17 +131,20 @@ namespace ProgressTrackingService.Feature.GetUserProgress
                     }).ToList()
 
                 }) .ToList();
-            ///Weakly ////
+            ///Weekly Stats (always current week vs previous week, regardless of period filter)////
 
             var today = DateTime.Today;
             var startOfCurrentWeek = today.AddDays(-7);
             var startOfPreviousWeek = today.AddDays(-14);
+            
             var currentWeek = workoutRepository.GetAll()
-                             .Where(w => w.CreatedAt >= startOfCurrentWeek && w.CreatedAt < today)
+                             .Where(w => w.UserId == request.userId && w.CreatedAt.HasValue)
+                             .Where(w => w.CreatedAt.Value >= startOfCurrentWeek && w.CreatedAt.Value < today)
                              .ToList();
 
             var previousWeek = workoutRepository.GetAll()
-                             .Where(w => w.CreatedAt >= startOfPreviousWeek && w.CreatedAt < startOfCurrentWeek)
+                             .Where(w => w.UserId == request.userId && w.CreatedAt.HasValue)
+                             .Where(w => w.CreatedAt.Value >= startOfPreviousWeek && w.CreatedAt.Value < startOfCurrentWeek)
                              .ToList();
 
             var currentStats = new WeeklyStatsDto
