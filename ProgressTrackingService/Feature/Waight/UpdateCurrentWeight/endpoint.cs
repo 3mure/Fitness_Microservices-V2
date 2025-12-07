@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ProgressTrackingService.Feature.Waight.UpdateCurrentWeight.DTOs;
 using ProgressTrackingService.Shared;
 
 namespace ProgressTrackingService.Feature.Waight.UpdateCurrentWeight

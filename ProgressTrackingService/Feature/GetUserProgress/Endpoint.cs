@@ -12,10 +12,10 @@ namespace ProgressTrackingService.Feature.GetUserProgress
         {
             _mediator = mediator;
         }
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetUserProgress(int userId)
+        [HttpGet]
+        public async Task<IActionResult> GetUserProgress([FromBody] GetUserProgressQuery requst)
         {
-            var query = new GetUserProgressQuery(userId);
+            var query = new GetUserProgressQuery(requst.userId);
             var result = await _mediator.Send(query);
             return Ok(result);
         }

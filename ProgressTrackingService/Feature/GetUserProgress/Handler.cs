@@ -133,7 +133,7 @@ namespace ProgressTrackingService.Feature.GetUserProgress
                 }) .ToList();
             ///Weekly Stats (always current week vs previous week, regardless of period filter)////
 
-            var today = DateTime.Today;
+            
             var startOfCurrentWeek = today.AddDays(-7);
             var startOfPreviousWeek = today.AddDays(-14);
             
