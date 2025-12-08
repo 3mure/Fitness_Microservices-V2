@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MediatR;
 using ProgressTrackingService.Domain.Entity;
 using ProgressTrackingService.Domain.Interfaces;
 using ProgressTrackingService.Feature.GetUserProgress.DTOs;
 using ProgressTrackingService.Helper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProgressTrackingService.Feature.GetUserProgress
 {
@@ -33,13 +35,11 @@ namespace ProgressTrackingService.Feature.GetUserProgress
             DateTime? endDateFilter = null;
             DateTime today = DateTime.Today;
 
-            if (!string.IsNullOrEmpty(request.startDate) && !string.IsNullOrEmpty(request.endDate))
+            if (request.startDate.HasValue && request.endDate.HasValue)
             {
                 // Custom date range
-                if (DateTime.TryParse(request.startDate, out DateTime parsedStart))
-                    startDateFilter = parsedStart.Date;
-                if (DateTime.TryParse(request.endDate, out DateTime parsedEnd))
-                    endDateFilter = parsedEnd.Date.AddDays(1).AddTicks(-1); // End of day
+                startDateFilter = request.startDate.Value.Date;
+                endDateFilter = request.endDate.Value.Date.AddDays(1).AddTicks(-1); // End of day
             }
             else
             {
@@ -194,7 +194,20 @@ namespace ProgressTrackingService.Feature.GetUserProgress
                 WeightHistory = weightEntries,
                 WorkoutHistory = WorkoutEntries,
                 WeeklyStats = weeklyStats,
-                Achievements = null
+                Achievements = achievementRepository.GetAll()
+                    .Include(ua => ua.Achievement)
+                    .Where(ua => ua.UserId == request.userId)
+                    .OrderByDescending(ua => ua.EarnedAt)
+                    .Select(ua => new AchievementDto
+                    {
+                        Id = ua.AchievementId,
+                        Name = ua.Achievement.Name,
+                        Description = ua.Achievement.Description,
+                        Icon = ua.Achievement.IconUrl,
+                        EarnedAt = ua.EarnedAt,
+                        Category = "General"
+                    })
+                    .ToList()
             };
             return Task.FromResult(userProgress); 
 
